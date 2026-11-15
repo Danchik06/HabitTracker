@@ -394,109 +394,120 @@
         val isCompleted: Boolean = false
     )
 
-package com.example.habittracker.domain.usecase
-
-import com.example.habittracker.domain.model.Habit
-import com.example.habittracker.domain.repository.HabitRepository
-import kotlinx.coroutines.flow.Flow
-
-class GetAllHabitsUseCase(
-private val repository: HabitRepository
-) {
-operator fun invoke(): Flow<List<Habit>> {
-return repository.getAllHabits()
-}
-}
-
-package com.example.habittracker.domain.usecase
-
-import com.example.habittracker.domain.model.Habit
-import com.example.habittracker.domain.repository.HabitRepository
-
-class AddHabitUseCase(
-private val repository: HabitRepository
-) {
-suspend operator fun invoke(habit: Habit) {
-repository.insertHabit(habit)
-}
-}
-
-package com.example.habittracker.domain.usecase
-
-import com.example.habittracker.domain.model.Habit
-import com.example.habittracker.domain.repository.HabitRepository
-
-class UpdateHabitUseCase(
-private val repository: HabitRepository
-) {
-suspend operator fun invoke(habit: Habit) {
-repository.updateHabit(habit)
-}
-}
-
-package com.example.habittracker.domain.usecase
-
-import com.example.habittracker.domain.model.Habit
-import com.example.habittracker.domain.repository.HabitRepository
-
-class DeleteHabitUseCase(
-private val repository: HabitRepository
-) {
-suspend operator fun invoke(habit: Habit) {
-repository.deleteHabit(habit)
-}
-}
-
-package com.example.habittracker.domain.usecase
-
-import com.example.habittracker.domain.model.HabitLog
-import com.example.habittracker.domain.repository.HabitLogRepository
-import kotlinx.coroutines.flow.first
-
-class CompleteHabitUseCase(
-private val repository: HabitLogRepository
-) {
-suspend operator fun invoke(
-habitId: Long,
-date: String
-) {
-val existingLog = repository
-.getLogForDate(habitId, date)
-.first()
-
-        if (existingLog == null) {
-            repository.insertLog(
-                HabitLog(
-                    habitId = habitId,
-                    date = date,
-                    completedCount = 1,
-                    isCompleted = true
-                )
-            )
-        } else if (!existingLog.isCompleted) {
-            repository.updateLog(
-                existingLog.copy(
-                    isCompleted = true,
-                    completedCount = maxOf(
-                        existingLog.completedCount,
-                        1
-                    )
-                )
-            )
+Файл 12: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.Habit
+    import com.example.habittracker.domain.repository.HabitRepository
+    import kotlinx.coroutines.flow.Flow
+    
+    class GetAllHabitsUseCase(
+        private val repository: HabitRepository
+    ) {
+        operator fun invoke(): Flow<List<Habit>> {
+            return repository.getAllHabits()
         }
     }
-}
 
-package com.example.habittracker.domain.usecase
+Файл 13: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.Habit
+    import com.example.habittracker.domain.repository.HabitRepository
+    
+    class AddHabitUseCase(
+        private val repository: HabitRepository
+    ) {
+        suspend operator fun invoke(habit: Habit) {
+            repository.insertHabit(habit)
+        }
+    }
 
-import com.example.habittracker.domain.model.HabitLog
-import com.example.habittracker.domain.repository.HabitLogRepository
-import kotlinx.coroutines.flow.Flow
+Файл 14: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.Habit
+    import com.example.habittracker.domain.repository.HabitRepository
+    
+    class UpdateHabitUseCase(
+        private val repository: HabitRepository
+    ) {
+        suspend operator fun invoke(habit: Habit) {
+            repository.updateHabit(habit)
+        }
+    }
 
-class GetHabitHistoryUseCase(
-private val repository: HabitLogRepository
-) {
-operator fun invoke(habitId: Long): Flow<List<HabitLog>> {
-return repository.getLogsForHabit(habitId)
-}
-}
+Файл 15: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.Habit
+    import com.example.habittracker.domain.repository.HabitRepository
+    
+    class DeleteHabitUseCase(
+        private val repository: HabitRepository
+    ) {
+        suspend operator fun invoke(habit: Habit) {
+            repository.deleteHabit(habit)
+        }
+    }
+
+Файл 16: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.HabitLog
+    import com.example.habittracker.domain.repository.HabitLogRepository
+    import kotlinx.coroutines.flow.first
+    
+    class CompleteHabitUseCase(
+        private val repository: HabitLogRepository
+    ) {
+        suspend operator fun invoke(
+        habitId: Long,
+        date: String
+        ) {
+            val existingLog = repository
+            .getLogForDate(habitId, date)
+            .first()
+            if (existingLog == null) {
+                repository.insertLog(
+                    HabitLog(
+                        habitId = habitId,
+                        date = date,
+                        completedCount = 1,
+                        isCompleted = true
+                    )
+                )
+            } else if (!existingLog.isCompleted) {
+                repository.updateLog(
+                    existingLog.copy(
+                        isCompleted = true,
+                        completedCount = maxOf(
+                            existingLog.completedCount,
+                            1
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+Файл 17: HabitLogEntity.kt
+---
+    package com.example.habittracker.domain.usecase
+    
+    import com.example.habittracker.domain.model.HabitLog
+    import com.example.habittracker.domain.repository.HabitLogRepository
+    import kotlinx.coroutines.flow.Flow
+    
+    class GetHabitHistoryUseCase(
+        private val repository: HabitLogRepository
+    ) {
+        operator fun invoke(habitId: Long): Flow<List<HabitLog>> {
+            return repository.getLogsForHabit(habitId)
+        }
+    }
