@@ -52,4 +52,5 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.57.1")
     ksp("com.google.dagger:hilt-android-compiler:2.57.1")
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
