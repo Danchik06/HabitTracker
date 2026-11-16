@@ -2,10 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.example.habittracker"
+
     compileSdk {
         version = release(37)
     }
@@ -28,6 +30,11 @@ android {
             }
         }
     }
+
+    buildFeatures {
+        compose = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -40,17 +47,36 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+
+    // Jetpack Compose
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+    // Tests
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("androidx.test:core:1.6.1")
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-    implementation("com.google.dagger:hilt-android:2.57.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    testImplementation(libs.kotlinx.coroutines.test)
 }

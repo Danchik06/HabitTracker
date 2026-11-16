@@ -1,0 +1,130 @@
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -2,4 +2,5 @@
+     alias(libs.plugins.android.application) apply false
+     id("com.google.devtools.ksp") version "2.3.6" apply false
+     id("com.google.dagger.hilt.android") version "2.60.1" apply false
++    alias(libs.plugins.compose.compiler) apply false
+ }
+--- a/gradle/libs.versions.toml
++++ b/gradle/libs.versions.toml
+@@ -14,6 +14,9 @@
+ hilt = "2.60.1"
+ lifecycle = "2.11.0"
+ coroutinesTest = "1.10.2"
++composeBom = "2026.09.00"
++navigation = "2.10.2"
++activityCompose = "1.13.0"
+ 
+ [libraries]
+ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+@@ -31,7 +34,16 @@
+ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
++compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
++compose-ui = { group = "androidx.compose.ui", name = "ui" }
++compose-material3 = { group = "androidx.compose.material3", name = "material3" }
++compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
++compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
++androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
++androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
++androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+ 
+ [plugins]
+ android-application = { id = "com.android.application", version.ref = "agp" }
+ hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
++compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -2,6 +2,7 @@
+     alias(libs.plugins.android.application)
+     id("com.google.devtools.ksp")
+     alias(libs.plugins.hilt.android)
++    alias(libs.plugins.compose.compiler)
+ }
+ 
+ android {
+@@ -28,6 +29,11 @@
+             }
+         }
+     }
++
++    buildFeatures {
++        compose = true
++    }
++
+     compileOptions {
+         sourceCompatibility = JavaVersion.VERSION_17
+         targetCompatibility = JavaVersion.VERSION_17
+@@ -40,6 +46,16 @@
+     implementation(libs.androidx.constraintlayout)
+     implementation(libs.androidx.core.ktx)
+     implementation(libs.material)
++
++    implementation(platform(libs.compose.bom))
++    implementation(libs.compose.ui)
++    implementation(libs.compose.material3)
++    implementation(libs.compose.ui.tooling.preview)
++    debugImplementation(libs.compose.ui.tooling)
++    implementation(libs.androidx.activity.compose)
++    implementation(libs.androidx.lifecycle.viewmodel.compose)
++    implementation(libs.androidx.navigation.compose)
++
+     testImplementation(libs.junit)
+     androidTestImplementation(libs.androidx.espresso.core)
+     androidTestImplementation(libs.androidx.junit)
+@@ -49,8 +65,8 @@
+     implementation(libs.androidx.room.runtime)
+     implementation(libs.androidx.room.ktx)
+     ksp(libs.androidx.room.compiler)
+-    implementation("com.google.dagger:hilt-android:2.57.1")
+-    ksp("com.google.dagger:hilt-android-compiler:2.57.1")
++    implementation(libs.hilt.android)
++    ksp(libs.hilt.compiler)
+     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+     testImplementation(libs.kotlinx.coroutines.test)
+ }
+--- a/app/src/main/java/com/example/habittracker/MainActivity.kt
++++ b/app/src/main/java/com/example/habittracker/MainActivity.kt
+@@ -1,20 +1,31 @@
+ package com.example.habittracker
+ 
+ import android.os.Bundle
++import androidx.activity.ComponentActivity
++import androidx.activity.compose.setContent
+ import androidx.activity.enableEdgeToEdge
+-import androidx.appcompat.app.AppCompatActivity
+-import androidx.core.view.ViewCompat
+-import androidx.core.view.WindowInsetsCompat
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Surface
++import androidx.compose.material3.Text
++import androidx.compose.ui.Modifier
++import dagger.hilt.android.AndroidEntryPoint
+ 
+-class MainActivity : AppCompatActivity() {
++@AndroidEntryPoint
++class MainActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         enableEdgeToEdge()
+-        setContentView(R.layout.activity_main)
+-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+-            insets
++
++        setContent {
++            MaterialTheme {
++                Surface(
++                    modifier = Modifier.fillMaxSize(),
++                    color = MaterialTheme.colorScheme.background
++                ) {
++                    Text(text = "Habit Tracker")
++                }
++            }
+         }
+     }
+ }
