@@ -20,6 +20,7 @@ import com.example.habittracker.domain.model.Habit
 fun HabitCard(
     habit: Habit,
     onComplete: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -57,6 +58,10 @@ fun HabitCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
+                TextButton(onClick = onEdit) {
+                    Text("Өңдеу")
+                }
+
                 TextButton(onClick = onDelete) {
                     Text("Өшіру")
                 }

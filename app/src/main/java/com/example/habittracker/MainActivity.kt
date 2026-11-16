@@ -4,13 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.habittracker.presentation.state.HabitUiEvent
-import com.example.habittracker.presentation.ui.home.HomeScreen
+import com.example.habittracker.presentation.navigation.HabitNavHost
 import com.example.habittracker.presentation.ui.theme.HabitTrackerTheme
 import com.example.habittracker.presentation.viewmodel.HabitViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             HabitTrackerTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
                 val snackbarHostState = remember {
                     SnackbarHostState()
                 }
@@ -42,11 +43,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                HomeScreen(
+                HabitNavHost(
+                    viewModel = viewModel,
                     uiState = uiState,
-                    snackbarHostState = snackbarHostState,
-                    onCompleteHabit = viewModel::completeHabit,
-                    onDeleteHabit = viewModel::deleteHabit
+                    snackbarHostState = snackbarHostState
                 )
             }
         }
